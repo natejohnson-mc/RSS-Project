@@ -203,10 +203,13 @@ def update_sheet_with_new_movies():
                 in_watchlist = 1 if tmdb_id in watchlist_ids else 0
                 in_not_interested = 1 if tmdb_id in not_interested_ids else 0
 
+                tmdb_url = f"https://www.themoviedb.org/movie/{tmdb_id}"
+
                 new_entries.append([
                     title,
                     release_date,
                     tmdb_id,
+                    tmdb_url,
                     datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
                     rule_id,
                     media_type_val,
@@ -214,6 +217,7 @@ def update_sheet_with_new_movies():
                     in_watchlist,
                     in_not_interested
                 ])
+
 
                 existing_ids.add(tmdb_id)
 
