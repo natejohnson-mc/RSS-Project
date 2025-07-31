@@ -96,6 +96,12 @@ def get_sheet():
     # 1 This must be returned for the rest of the script to work
     return client.open(GOOGLE_SHEET_NAME).sheet1
 
+# === EXCLUDE SHORT FILMS ===
+def is_short_film(tmdb_id):
+    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}/keywords"
+    res = requests.get(url, params={'api_key': TMDB_API_KEY}).json()
+    keywords = [kw['name'].lower() for kw in res.get('keywords', [])]
+    return 'short film' in keywords
 
 # === MAIN LOGIC ===
 def update_sheet_with_new_movies():
@@ -160,6 +166,11 @@ def update_sheet_with_new_movies():
 
             if not release_date:
                 continue  # skip unreleased or unannounced projects
+
+            # Skip short films
+            if is_short_film(tmdb_id):
+                print(f"⏩ Skipping short film: {title}")
+                continue
 
             if media_type != "any" and media_type.lower() not in media_type_val.lower():
                 continue
