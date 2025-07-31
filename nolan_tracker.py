@@ -45,7 +45,7 @@ def get_user_tmdb_ids():
     
     account_id = account_resp.get("id")
     if not account_id:
-        print("❌ Failed to get account ID from TMDb.")
+        print("0 Failed to get account ID from TMDb.")
         return set(), set()
 
     # Step 2: Get rated movie IDs
@@ -91,9 +91,9 @@ def get_sheet():
     # Optional debug (you can delete this part)
     print("📄 Listing accessible spreadsheets...")
     for sheet in client.openall():
-        print("✅ Found:", sheet.title)
+        print("1 Found:", sheet.title)
 
-    # ✅ This must be returned for the rest of the script to work
+    # 1 This must be returned for the rest of the script to work
     return client.open(GOOGLE_SHEET_NAME).sheet1
 
 
@@ -164,8 +164,8 @@ def update_sheet_with_new_movies():
                 continue
 
             if tmdb_id not in existing_ids:
-                already_rated = "✅" if tmdb_id in rated_ids else "❌"
-                in_watchlist = "✅" if tmdb_id in watchlist_ids else "❌"
+                already_rated = 1 if tmdb_id in rated_ids else 0
+                in_watchlist = 1 if tmdb_id in watchlist_ids else 0
 
                 new_entries.append([
                     title,
@@ -182,7 +182,7 @@ def update_sheet_with_new_movies():
 
     if new_entries:
         result_sheet.append_rows(new_entries)
-        print(f"✅ Added {len(new_entries)} new movie(s) to the sheet.")
+        print(f"1 Added {len(new_entries)} new movie(s) to the sheet.")
     else:
         print("No new matches.")
 
