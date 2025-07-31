@@ -136,7 +136,10 @@ def update_sheet_with_new_movies():
     client = gspread.service_account(filename=GOOGLE_CREDS_FILE)
 
     rulebook_sheet = client.open(RULEBOOK_SHEET_NAME).sheet1
+    
+    # Clear all data below the header (row 1)
     result_sheet = client.open(RESULT_SHEET_NAME).sheet1
+    result_sheet.resize(rows=1)
 
     # Load user's rated/watchlist TMDb IDs once
     rated_ids, watchlist_ids = get_user_tmdb_ids()
