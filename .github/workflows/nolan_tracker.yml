@@ -1,0 +1,31 @@
+name: Run Nolan Tracker Weekly
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'  # Every Monday at 14:00 UTC
+  workflow_dispatch:      # Manual trigger
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write credentials and run script
+        env:
+          TMDB_ACCESS_TOKEN: ${{ secrets.TMDB_ACCESS_TOKEN }}
+          GOOGLE_SHEET_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEET_CREDENTIALS_JSON }}
+          SERVICE_ACCOUNT_FILE: service_account.json
+        run: |
+          echo "$GOOGLE_SHEET_CREDENTIALS_JSON" > service_account.json
+          python nolan_tracker.py
