@@ -188,6 +188,7 @@ def update_sheet_with_new_movies():
                 f"https://api.themoviedb.org/3/movie/{tmdb_id}",
                 params={'api_key': TMDB_API_KEY}
             ).json()
+            media_type_val = 'Feature Film' if movie.get('media_type') == 'movie' or 'title' in movie else 'TV Show'
             if media_type_val == 'Feature Film':
                 runtime = details_resp.get('runtime', '')
             else:
@@ -196,7 +197,6 @@ def update_sheet_with_new_movies():
 
             title = movie.get('title') or movie.get('name') or '(Untitled)'
             release_date = movie.get('release_date') or movie.get('first_air_date', '')
-            media_type_val = 'Feature Film' if movie.get('media_type') == 'movie' or 'title' in movie else 'TV Show'
 
 
             if not release_date:
@@ -220,6 +220,7 @@ def update_sheet_with_new_movies():
                 new_entries.append([
                     title,
                     release_date,
+                    runtime,
                     tmdb_id,
                     tmdb_url,
                     datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
@@ -227,8 +228,7 @@ def update_sheet_with_new_movies():
                     media_type_val,
                     already_rated,
                     in_watchlist,
-                    in_not_interested,
-                    runtime
+                    in_not_interested
                 ])
 
 
