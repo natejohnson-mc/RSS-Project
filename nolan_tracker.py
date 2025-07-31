@@ -1,7 +1,7 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 
 # === CONFIGURATION ===
 TMDB_API_KEY = 'b7bbd8aa9c2da9716e1787de38e56329'
@@ -13,6 +13,26 @@ RULEBOOK_SHEET_NAME = 'Rulebook'
 RESULT_SHEET_NAME = 'Nolan Watch Tracker'  # same sheet as before, or new if you prefer
 
 # === TMDB HELPER ===
+def get_not_interested_ids():
+    not_interested_ids = set()
+    page = 1
+
+    while True:
+        url = f"https://api.themoviedb.org/4/list/8546771?page={page}"
+        headers = {
+            'Authorization': f'Bearer {TMDB_ACCESS_TOKEN}'
+        }
+        res = requests.get(url, headers=headers).json()
+
+        for item in res.get("results", []):
+            not_interested_ids.add(str(item["id"]))
+
+        if page >= res.get("total_pages", 1):
+            break
+        page += 1
+
+    return not_interested_ids
+
 def get_nolan_directed_movies():
     nolan_id = 525  # Christopher Nolan's TMDb person ID
     url = f"https://api.themoviedb.org/3/person/{nolan_id}/movie_credits?api_key={TMDB_API_KEY}"
@@ -118,6 +138,7 @@ def update_sheet_with_new_movies():
 
     # Load user's rated/watchlist TMDb IDs once
     rated_ids, watchlist_ids = get_user_tmdb_ids()
+    not_interested_ids = get_not_interested_ids()
 
     rules = rulebook_sheet.get_all_records()
     existing_ids = set(row[2] for row in result_sheet.get_all_values()[1:] if len(row) >= 3)
@@ -178,16 +199,18 @@ def update_sheet_with_new_movies():
             if tmdb_id not in existing_ids:
                 already_rated = 1 if tmdb_id in rated_ids else 0
                 in_watchlist = 1 if tmdb_id in watchlist_ids else 0
+                in_not_interested = 1 if tmdb_id in not_interested_ids else 0
 
                 new_entries.append([
                     title,
                     release_date,
                     tmdb_id,
-                    datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M'),
                     rule_id,
                     media_type_val,
                     already_rated,
-                    in_watchlist
+                    in_watchlist,
+                    in_not_interested
                 ])
 
                 existing_ids.add(tmdb_id)
