@@ -182,21 +182,21 @@ def update_sheet_with_new_movies():
 
         for movie in matching_credits:
             tmdb_id = str(movie['id'])
+            title = movie.get('title') or movie.get('name') or '(Untitled)'
+            release_date = movie.get('release_date') or movie.get('first_air_date', '')
+            media_type_val = 'Feature Film' if movie.get('media_type') == 'movie' or 'title' in movie else 'TV Show'
 
             # Fetch movie details to get runtime
             details_resp = requests.get(
                 f"https://api.themoviedb.org/3/movie/{tmdb_id}",
                 params={'api_key': TMDB_API_KEY}
             ).json()
-            media_type_val = 'Feature Film' if movie.get('media_type') == 'movie' or 'title' in movie else 'TV Show'
             if media_type_val == 'Feature Film':
                 runtime = details_resp.get('runtime', '')
             else:
                 runtime = ''
 
 
-            title = movie.get('title') or movie.get('name') or '(Untitled)'
-            release_date = movie.get('release_date') or movie.get('first_air_date', '')
 
 
             if not release_date:
