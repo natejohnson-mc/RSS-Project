@@ -110,6 +110,9 @@ def update_sheet_with_new_movies():
     rulebook_sheet = client.open(RULEBOOK_SHEET_NAME).sheet1
     result_sheet = client.open(RESULT_SHEET_NAME).sheet1
 
+    # Load user's rated/watchlist TMDb IDs once
+    rated_ids, watchlist_ids = get_user_tmdb_ids()
+
     rules = rulebook_sheet.get_all_records()
     existing_ids = set(row[2] for row in result_sheet.get_all_values()[1:] if len(row) >= 3)
     new_entries = []
@@ -153,8 +156,6 @@ def update_sheet_with_new_movies():
             title = movie.get('title') or movie.get('name') or '(Untitled)'
             release_date = movie.get('release_date') or movie.get('first_air_date', '')
             media_type_val = 'Feature Film' if movie.get('media_type') == 'movie' or 'title' in movie else 'TV Show'
-            # Load user's rated/watchlist TMDb IDs once
-            rated_ids, watchlist_ids = get_user_tmdb_ids()
 
 
             if not release_date:
